@@ -1,8 +1,8 @@
-[![icon][icon]][self]
+[![qstd][banner]][qstd]
 
 # `qstd`
 
 > _Compiled-time-checked quantum programming in Rust._
 
-[self]: https://github.com/qstd-rs/qstd
-[icon]: https://github.com/qstd-rs/qstd/blob/main/icons/qstd.png?raw=true
+[qstd]: https://github.com/qstd-rs/qstd
+[banner]: https://github.com/qstd-rs/qstd/blob/main/images/banner.png?raw=true
