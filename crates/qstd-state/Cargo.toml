@@ -1,0 +1,20 @@
+[package]
+name = "qstd-state"
+version.workspace = true
+authors.workspace = true
+rust-version.workspace = true
+edition.workspace = true
+description = "State vector for qstd."
+readme = "README.md"
+documentation = "https://docs.rs/qstd-state"
+repository.workspace = true
+license.workspace = true
+
+[dependencies.qstd-brand]
+workspace = true
+
+[dependencies.qstd-core]
+workspace = true
+
+[dependencies.qstd-num]
+workspace = true

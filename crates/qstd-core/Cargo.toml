@@ -1,0 +1,21 @@
+[package]
+name = "qstd-core"
+version.workspace = true
+authors.workspace = true
+rust-version.workspace = true
+edition.workspace = true
+description = "... (core)"
+readme = "README.md"
+repository.workspace = true
+license.workspace = true
+
+[dependencies.trait-aliases]
+workspace = true
+
+[dependencies.qstd-brand]
+workspace = true
+
+[features]
+default = ["std"]
+std = []
+alloc = []

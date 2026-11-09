@@ -1,0 +1,12 @@
+[package]
+name = "qstd-brand"
+version.workspace = true
+authors.workspace = true
+rust-version.workspace = true
+edition.workspace = true
+description = "Generative and runtime brands for qstd."
+readme = "README.md"
+documentation = "https://docs.rs/qstd-brand"
+repository.workspace = true
+license.workspace = true
+categories = ["no-std", "no-std::no-alloc", "rust-patterns"]
