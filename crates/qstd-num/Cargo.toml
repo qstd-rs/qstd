@@ -11,8 +11,15 @@ repository.workspace = true
 license.workspace = true
 categories = ["no-std", "no-std::no-alloc"]
 
+[dependencies.rand]
+workspace = true
+optional = true
+
 [dependencies.trait-aliases]
 workspace = true
 
 [features]
+default = ["std", "rand"]
+rand = ["dep:rand"]
+std = []
 unsafe-assert = []

@@ -1,22 +1,31 @@
-use core::fmt;
-
-use crate::{
-    consts::{one, zero},
-    float::{DefaultFloat, Float},
-    real::Real,
+use core::{
+    fmt,
+    ops::{Add, Sub},
 };
 
-pub type Pair<T> = (T, T);
+use crate::{
+    approximate::ApproxEq,
+    float::{DefaultFloat, Float},
+    tolerance::Tolerance,
+};
 
 pub const PLUS: char = '+';
 pub const MINUS: char = '-';
 pub const UNIT: char = 'i';
 
-#[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 #[repr(C)]
 pub struct Complex<F: Float = DefaultFloat> {
-    pub re: Real<F>,
-    pub im: Real<F>,
+    pub re: F,
+    pub im: F,
+}
+
+impl<F: Float> ApproxEq for Complex<F> {
+    type Epsilon = F;
+
+    fn approx_eq(self, other: Self, tolerance: Tolerance<Self::Epsilon>) -> bool {
+        (self - other).norm_squared() <= tolerance.epsilon_squared()
+    }
 }
 
 pub type DefaultComplex = Complex<DefaultFloat>;
@@ -51,48 +60,106 @@ impl<F: Float> fmt::Display for Complex<F> {
     }
 }
 
+pub const fn zero<F: Float>() -> Complex<F> {
+    Complex::new(F::ZERO, F::ZERO)
+}
+
+pub const fn one<F: Float>() -> Complex<F> {
+    Complex::new(F::ONE, F::ZERO)
+}
+
+pub const fn i<F: Float>() -> Complex<F> {
+    Complex::new(F::ZERO, F::ONE)
+}
+
+pub const fn minus_i<F: Float>() -> Complex<F> {
+    Complex::new(F::ZERO, F::NEGATIVE_ONE)
+}
+
 impl<F: Float> Complex<F> {
-    pub const fn with(re: Real<F>, im: Real<F>) -> Self {
+    pub const fn new(re: F, im: F) -> Self {
         Self { re, im }
     }
 
-    pub const fn re(self) -> Real<F> {
+    pub const fn re(self) -> F {
         self.re
     }
 
-    pub const fn im(self) -> Real<F> {
+    pub const fn im(self) -> F {
         self.im
     }
 
-    pub const fn pair(self) -> Pair<Real<F>> {
-        (self.re, self.im)
+    pub const fn set_re(&mut self, re: F) {
+        self.re = re;
     }
 
-    pub const fn get_re_no_assert(self) -> F {
-        self.re().get_no_assert()
+    pub const fn set_im(&mut self, im: F) {
+        self.im = im;
     }
 
-    pub const fn get_im_no_assert(self) -> F {
-        self.im().get_no_assert()
+    pub const fn get_mut(&mut self) -> (&mut F, &mut F) {
+        (&mut self.re, &mut self.im)
     }
 
-    pub const fn get_no_assert(self) -> Pair<F> {
-        (self.get_re_no_assert(), self.get_im_no_assert())
+    pub const fn get(self) -> (F, F) {
+        (self.re(), self.im())
     }
 
-    pub fn get_re(self) -> F {
-        self.re().get()
+    pub fn conjugated(self) -> Self {
+        let (re, im) = self.get();
+
+        Self::new(re, -im)
     }
 
-    pub fn get_im(self) -> F {
-        self.im().get()
+    pub fn conjugate(&mut self) {
+        *self = self.conjugated();
     }
 
-    pub fn get(self) -> Pair<F> {
-        (self.get_re(), self.get_im())
+    pub fn scaled(self, factor: F) -> Self {
+        let (re, im) = self.get();
+
+        Self::new(re * factor, im * factor)
     }
 
-    pub const ZERO: Self = Self::with(zero(), zero());
-    pub const ONE: Self = Self::with(one(), zero());
-    pub const I: Self = Self::with(zero(), one());
+    pub fn norm_squared(self) -> F {
+        let (re, im) = self.get();
+
+        re * re + im * im
+    }
+
+    pub fn scale(&mut self, factor: F) {
+        *self = self.scaled(factor);
+    }
+
+    #[cfg(feature = "std")]
+    pub fn norm(self) -> F {
+        self.norm_squared().sqrt()
+    }
+
+    pub const ZERO: Self = zero();
+    pub const ONE: Self = one();
+    pub const I: Self = i();
+    pub const MINUS_I: Self = minus_i();
+}
+
+impl<F: Float> Add for Complex<F> {
+    type Output = Self;
+
+    fn add(self, other: Self) -> Self::Output {
+        let (a, b) = self.get();
+        let (c, d) = other.get();
+
+        Self::Output::new(a + c, b + d)
+    }
+}
+
+impl<F: Float> Sub for Complex<F> {
+    type Output = Self;
+
+    fn sub(self, other: Self) -> Self::Output {
+        let (a, b) = self.get();
+        let (c, d) = other.get();
+
+        Self::Output::new(a - c, b - d)
+    }
 }

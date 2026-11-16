@@ -1,14 +1,24 @@
-#[cfg(feature = "unsafe-assert")]
-use core::hint::assert_unchecked;
+use core::ops::Neg;
 
 use crate::{
-    consts::{Const, One, Zero},
+    approximate::ApproxEq,
+    consts::{Const, Epsilon, Half, NegativeOne, One, Two, Zero},
     float::{DefaultFloat, Float},
+    tolerance::Tolerance,
 };
 
-#[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
+#[repr(transparent)]
 pub struct Real<F: Float = DefaultFloat> {
     float: F,
+}
+
+impl<F: Float> ApproxEq for Real<F> {
+    type Epsilon = F;
+
+    fn approx_eq(self, other: Self, tolerance: Tolerance<F>) -> bool {
+        self.get().approx_eq(other.get(), tolerance)
+    }
 }
 
 pub type DefaultReal = Real<DefaultFloat>;
@@ -24,17 +34,28 @@ impl<F: Float> Real<F> {
         Self { float }
     }
 
-    pub const fn get_no_assert(self) -> F {
+    pub const fn get(self) -> F {
         self.float
     }
 
-    pub fn get(self) -> F {
-        let float = self.get_no_assert();
+    pub fn half(self) -> Self {
+        let float = self.get();
 
-        #[cfg(feature = "unsafe-assert")]
-        assert_unchecked(float.is_finite());
+        let half = float / F::TWO;
 
-        float
+        unsafe { Self::new_unchecked(half) }
+    }
+}
+
+impl<F: Float> Neg for Real<F> {
+    type Output = Self;
+
+    fn neg(self) -> Self::Output {
+        let float = self.get();
+
+        let negated = -float;
+
+        unsafe { Self::new_unchecked(negated) }
     }
 }
 
@@ -46,8 +67,26 @@ unsafe impl<F: Float> One for Real<F> {
     const ONE: Self = unsafe { Self::new_unchecked(F::ONE) };
 }
 
+unsafe impl<F: Float> Half for Real<F> {
+    const HALF: Self = unsafe { Self::new_unchecked(F::HALF) };
+}
+
+unsafe impl<F: Float> NegativeOne for Real<F> {
+    const NEGATIVE_ONE: Self = unsafe { Self::new_unchecked(F::NEGATIVE_ONE) };
+}
+
+unsafe impl<F: Float> Two for Real<F> {
+    const TWO: Self = unsafe { Self::new_unchecked(F::TWO) };
+}
+
+unsafe impl<F: Float> Epsilon for Real<F> {
+    const COMPARE: Self = unsafe { Self::new_unchecked(F::COMPARE) };
+    const UNITARY: Self = unsafe { Self::new_unchecked(F::UNITARY) };
+}
+
 unsafe impl<F: Float> Const for Real<F> {
     const FRAC_1_SQRT_2: Self = unsafe { Self::new_unchecked(F::FRAC_1_SQRT_2) };
+    const FRAC_PI_4: Self = unsafe { Self::new_unchecked(F::FRAC_PI_4) };
 }
 
 impl Real<f32> {

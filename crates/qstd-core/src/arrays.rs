@@ -3,7 +3,7 @@ use core::array;
 use crate::{
     aliases::{Array, Index, MeasureFn, Size},
     bits::Bit,
-    internals::const_assert_sum,
+    const_assert_eq,
 };
 
 pub type Pair<T> = (T, T);
@@ -23,7 +23,7 @@ pub trait ArrayMethods<T, const N: Size> {
 
 impl<T, const N: Size> ArrayMethods<T, N> for Array<T, N> {
     fn split_mut<const L: Size, const R: Size>(&mut self) -> (&mut Array<T, L>, &mut Array<T, R>) {
-        const_assert_sum!(L, R, N, "split sizes must add up to the array length");
+        const_assert_eq!(L + R, N, "split sizes must add up to the array length");
 
         let (left, right) = self.split_at_mut(L);
 
@@ -34,7 +34,7 @@ impl<T, const N: Size> ArrayMethods<T, N> for Array<T, N> {
     }
 
     fn split<const L: Size, const R: Size>(self) -> (Array<T, L>, Array<T, R>) {
-        const_assert_sum!(L, R, N, "split sizes must add up to the array length");
+        const_assert_eq!(L + R, N, "split sizes must add up to the array length");
 
         let mut iterator = self.into_iter();
 

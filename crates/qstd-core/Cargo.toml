@@ -15,7 +15,11 @@ workspace = true
 [dependencies.qstd-brand]
 workspace = true
 
+[dependencies.qstd-num]
+workspace = true
+default-features = false
+
 [features]
 default = ["std"]
-std = []
+std = ["qstd-num/std"]
 alloc = []

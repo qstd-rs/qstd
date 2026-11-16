@@ -1,6 +1,6 @@
 use core::fmt;
 
-use crate::invariant::PhantomInvariantLifetime;
+use crate::{internals::const_assert_zero_sized, invariant::PhantomInvariantLifetime};
 
 pub const INVARIANT: &str = "invariant";
 pub const UNIQUE: &str = "unique";
@@ -90,6 +90,8 @@ impl<'id> Guard<'id> {
         self.id
     }
 }
+
+const_assert_zero_sized!(Id<'_>, Guard<'_>);
 
 #[doc(hidden)]
 pub mod private {

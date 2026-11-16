@@ -1,5 +1,7 @@
 use crate::aliases::Traits;
 
+pub type Extracted = f64;
+
 pub trait Float: Traits {
     fn is_sign_negative(self) -> bool;
 
@@ -10,6 +12,11 @@ pub trait Float: Traits {
     fn is_finite(self) -> bool;
 
     fn is_nan(self) -> bool;
+
+    #[cfg(feature = "std")]
+    fn sqrt(self) -> Self;
+
+    fn extract(self) -> Extracted;
 }
 
 inherent!(f32, f64);
@@ -38,6 +45,15 @@ macro_rules! inherent {
 
                 fn is_nan(self) -> bool {
                     self.is_nan()
+                }
+
+                #[cfg(feature = "std")]
+                fn sqrt(self) -> Self {
+                    self.sqrt()
+                }
+
+                fn extract(self) -> $crate::float::Extracted {
+                    self as $crate::float::Extracted
                 }
             }
         )+

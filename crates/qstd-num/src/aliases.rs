@@ -6,7 +6,10 @@ use core::{
 
 use trait_aliases::trait_aliases;
 
-use crate::consts::{Const, One, Zero};
+use crate::{
+    approximate::ApproxEq,
+    consts::{Const, Epsilon, Half, NegativeOne, One, Two, Zero},
+};
 
 trait_aliases! {
     #[trait_alias(N)]
@@ -35,7 +38,7 @@ trait_aliases! {
     pub trait Ordered = PartialOrd + Number;
 
     #[trait_alias(N)]
-    pub trait Signed = Ordered + Negate;
+    pub trait Signed = Ordered + Negate + NegativeOne;
 
     #[trait_alias(T)]
     pub trait Thread = Send + Sync;
@@ -43,6 +46,19 @@ trait_aliases! {
     #[trait_alias(T)]
     pub trait Format = Debug + Display;
 
+    #[trait_alias(F)]
+    pub trait Approximate<R = Self, E = Self> = ApproxEq<R, Epsilon = E>;
+
     #[trait_alias(R)]
-    pub trait Traits = Copy + Default + Thread + Format + Fold + Signed + Const;
+    pub trait Traits = Copy
+        + Default
+        + Thread
+        + Format
+        + Fold
+        + Signed
+        + Half
+        + Two
+        + Const
+        + Epsilon
+        + Approximate;
 }

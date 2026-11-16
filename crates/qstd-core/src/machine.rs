@@ -12,6 +12,8 @@ pub trait Machine {
     type Bit: Bit;
 }
 
+pub type QubitMut<'i, M> = &'i mut <M as Machine>::Qubit;
+
 pub type Register<M, const N: Size> = Array<<M as Machine>::Qubit, N>;
 
 pub type DynRegister<M> = Dyn<<M as Machine>::Qubit>;
